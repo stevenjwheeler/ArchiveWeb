@@ -1,0 +1,149 @@
+<style>
+    body {
+        margin: 0;
+        background-color: #23272a;
+        color: white;
+        font-family: "Bahnschrift Light";
+    }
+
+    .title-box {
+        background-color: #23272a;
+        position: sticky;
+        top: 0px;
+        display: flex;
+        flex-direction: column;
+        border-bottom: #3e4244 1px solid;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-gap: 1.5%;
+        margin: 2%;
+    }
+
+    @media only screen and (max-width: 1920px) {
+    .content-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    }
+    }
+
+    @media only screen and (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+    }
+    }
+
+    @media only screen and (max-width: 992px) {
+    .content-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+    }
+
+    @media only screen and (max-width: 768px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+    }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        vertical-align: middle;
+        justify-content: center;
+        background-color: #404abe;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .button {
+        width: 2rem; 
+        height: 2rem; 
+        background-color: #3e4244; 
+        border: none; 
+        outline: none; 
+        border-radius: 50%; 
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: #5865f2;
+    }
+
+    .javascript-error-background {
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        background-color: #23272a;
+    }
+
+    .javascript-error {
+        display: flex;
+        color: rgb(180, 46, 46);
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        background-color: white;
+        padding: 1.5rem;
+        margin: 1.5rem;
+        border-radius: 1rem;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0.6em;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1e2124;
+        border-radius: 50px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #3e4244;
+        border-radius: 50px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #404abe;
+    }
+</style>
+  
+<noscript>
+    <div class="javascript-error-background">
+        <div class="javascript-error">
+            This web app requires JavaScript to be enabled in order to function properly.<br>
+            Please enable JavaScript in your browser settings or unblock scripts, and try again.
+        </div>
+    </div>
+</noscript>
+
+<head>
+    <title>ArchiveWeb - <%= archiveName %></title>
+</head>
+
+<body>
+    <div class="title-box">
+        <h1 style="margin-bottom: 0; margin-left: 2.5%;">ArchiveWeb - <%= archiveName %></h1>
+        <p style="margin-left: 2.5%;">Storing the essentials since 2023</p>
+    </div>
+    <% if (archiveEntries.length == 0) { %>
+        <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
+        <br>Click refresh to gather new entries!</p>
+    <% } %>
+    <div class="content-grid">
+        <% archiveEntries.forEach(function(item) { %>
+            <div class="content">
+                <p><%= item[0] %></p>
+                <image src="<%= item[1] %>" style="width: 100%; height: 100%; object-fit: cover;"/>
+            </div>
+        <% }); %>
+    </div>
+</body>
