@@ -17,6 +17,7 @@ module.exports = {
     const archiveListPath = path.join(__dirname, 'datastructure', 'archiveList.json')
     const archiveList = JSON.parse(fs.readFileSync(archiveListPath))
     
+    // set up the routes for getting pages
     app.get('/', (req, res) => {
       res.render('menu.html', {archiveList: archiveList})
     })
@@ -42,6 +43,82 @@ module.exports = {
       if (option === 'createArchive') {
         res.render('settings/createArchive.html', {error: ''})
       }
+      if (option === 'deleteArchive') {
+        res.render('settings/deleteArchive.html', {archiveList: archiveList, error : ''})
+      }
+      if (option === 'renameArchive') {
+        res.render('settings/renameArchive.html', {archiveList: archiveList, error : ''})
+      }
+      if (option === 'changeArchiveSource') {
+        res.render('settings/changeArchiveSource.html', {archiveList: archiveList, error : ''})
+      }
+    })
+
+    app.get('*' , (req, res) => {
+      res.redirect('/')
+    })
+
+    // set up the routes for posting data
+    app.post('/submit-source', (req, res) => {
+      const archiveName = req.body.name
+      for (let i = 0; i < archiveList.length; i++) {
+        if (archiveList[i][0] === archiveName) {
+          const newSource = req.body.source
+          const cookies = req.body.cookies
+          archiveList[i][1] = newSource
+          archiveList[i][2] = cookies
+          fs.writeFileSync(archiveListPath, JSON.stringify(archiveList))
+          res.redirect('/')
+          return
+        }
+      }
+      res.render('./settings/changeArchiveSource', {archiveList: archiveList, error: 'Please select an archive to change the source of'})
+    })
+
+    app.post('/submit-rename', (req, res) => {
+      const archiveName = req.body.name
+      for (let i = 0; i < archiveList.length; i++) {
+        if (archiveList[i][0] === archiveName) {
+          const newName = req.body.newname
+          for (let j = 0; j < archiveList.length; j++) {
+            if (archiveList[j][0] === newName) {
+              res.render('./settings/renameArchive', {archiveList: archiveList, error: 'New name already exists'})
+              return
+            }
+          }
+          // rename the archive in the archive list
+          archiveList[i][0] = newName
+          fs.writeFileSync(archiveListPath, JSON.stringify(archiveList))
+          // rename the archive database
+          const archiveDir = path.join(__dirname, 'datastructure', archiveName)
+          const newArchiveDir = path.join(__dirname, 'datastructure', newName)
+          if (fs.existsSync(archiveDir)) {
+            fs.renameSync(archiveDir, newArchiveDir)
+          }
+          res.redirect('/')
+          return
+        }
+      }
+      res.render('./settings/renameArchive', {archiveList: archiveList, error: 'Please select an archive to rename'})
+    })
+
+    app.post('/submit-delete', (req, res) => {
+      const archiveName = req.body.name
+      for (let i = 0; i < archiveList.length; i++) {
+        if (archiveList[i][0] === archiveName) {
+          // delete the archive from the archive list
+          archiveList.splice(i, 1)
+          fs.writeFileSync(archiveListPath, JSON.stringify(archiveList))
+          // delete the archive database
+          const archiveDir = path.join(__dirname, 'datastructure', archiveName)
+          if (fs.existsSync(archiveDir)) {
+            fs.rmdirSync(archiveDir, {recursive: true})
+          }
+          res.redirect('/')
+          return
+        }
+      }
+      res.render('./settings/deleteArchive', {archiveList: archiveList, error: 'Please select an archive to delete'})
     })
 
     app.post('/submit-create', (req, res) => {
@@ -55,11 +132,9 @@ module.exports = {
       const archiveSource = req.body.source
       const archiveCookies = req.body.cookies
         
-      // add to the archive list
       archiveList.push([archiveName, archiveSource, archiveCookies])
       fs.writeFileSync(archiveListPath, JSON.stringify(archiveList))
 
-      // create the archive database
       const archiveDir = path.join(__dirname, 'datastructure', archiveName)
       if (!fs.existsSync(archiveDir)) {
         fs.mkdirSync(archiveDir)
@@ -72,10 +147,7 @@ module.exports = {
       res.redirect('/')
     })
 
-    app.get('*' , (req, res) => {
-      res.redirect('/')
-    })
-
+    // start the web server
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}`)
     })
@@ -92,7 +164,6 @@ module.exports = {
     if (!fs.existsSync(archiveListPath)) {
       fs.writeFileSync(archiveListPath, JSON.stringify([]))
     }
-
   }
 }
 
