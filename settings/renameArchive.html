@@ -110,17 +110,24 @@
     </div>
     <div class="settings-box">
         <div class="settings-panel">
-            <p style="font-weight: bold; margin-left: 2.5%;">Archive management</p>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;" onclick="location.href='/settings/createArchive'">Create an archive</button>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;" onclick="location.href='/settings/deleteArchive'">Delete an archive</button>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;" onclick="location.href='/settings/renameArchive'">Rename an archive</button>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;" onclick="location.href='/settings/changeArchiveSource'">Change archive source</button>
-            <p style="font-weight: bold; margin-left: 2.5%;"><br><br>Backups</p>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;">Take backup of archive</button>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;">Restore backup of archive</button>
-            <p style="font-weight: bold; margin-left: 2.5%;"><br><br>Security</p>
-                <button class="button" style="margin-left: 2.5%; margin-right: 2.5%;">Set ArchiveWeb password</button>
-            <p style="align-self: center;"><br><br>ArchiveWeb version 1.0.0</p>
+            <p style="font-weight: bold; margin-left: 2.5%;">Renaming archive</p>
+            <% if (error) { %>
+                <p style="color: rgb(180, 46, 46); font-weight: bold; margin-left: 2.5%;">Error: <%= error %></p>
+            <% } %>
+            <form method="POST" action="/submit-rename" style="display: flex; flex-direction: column; margin: 5%;">
+                * Select an archive: <select id="name" name="name" style="margin: 5px;">
+                    <option value="default">Select an archive</option>
+                    <!-- for each item in archive list, add to dropdown-->
+                    <% archiveList.forEach(function(item) { %>
+                        <% itemname = item[0] %>
+                        <option value="<%= itemname %>"><%= itemname %></option>
+                    <% }); %>
+                </select>
+                <br>
+                * New name: <input type="text" name="newname" required="true" />
+                <br><br><br>
+                <input type="submit" />
+            </form>
         </div>
     </div>
 </body>
