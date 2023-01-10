@@ -46,28 +46,30 @@ module.exports = {
 
     app.post('/submit-create', (req, res) => {
       const archiveName = req.body.name
-      if (archiveList.includes(archiveName)) {
-        res.render('./settings/createArchive', {error: 'Archive name already exists'})
-      } else {
-        const archiveSource = req.body.source
-        const archiveCookies = req.body.cookies
-        
-        // create the archive list
-        archiveList.push([archiveName, archiveSource, archiveCookies])
-        fs.writeFileSync(archiveListPath, JSON.stringify(archiveList))
-
-        // create the archive database
-        const archiveDir = path.join(__dirname, 'datastructure', archiveName)
-        if (!fs.existsSync(archiveDir)) {
-          fs.mkdirSync(archiveDir)
-          fs.mkdirSync(path.join(archiveDir, 'assets'))
+      for (let i = 0; i < archiveList.length; i++) {
+        if (archiveList[i][0] === archiveName) {
+          res.render('./settings/createArchive', {error: 'Archive name already exists'})
+          return
         }
-        const archiveDatabasePath = path.join(archiveDir, 'archiveDatabase.json')
-        if (!fs.existsSync(archiveDatabasePath)) {
-          fs.writeFileSync(archiveDatabasePath, JSON.stringify([]))
-        }
-        res.redirect('/')
       }
+      const archiveSource = req.body.source
+      const archiveCookies = req.body.cookies
+        
+      // add to the archive list
+      archiveList.push([archiveName, archiveSource, archiveCookies])
+      fs.writeFileSync(archiveListPath, JSON.stringify(archiveList))
+
+      // create the archive database
+      const archiveDir = path.join(__dirname, 'datastructure', archiveName)
+      if (!fs.existsSync(archiveDir)) {
+        fs.mkdirSync(archiveDir)
+        fs.mkdirSync(path.join(archiveDir, 'assets'))
+      }
+      const archiveDatabasePath = path.join(archiveDir, 'archiveDatabase.json')
+      if (!fs.existsSync(archiveDatabasePath)) {
+        fs.writeFileSync(archiveDatabasePath, JSON.stringify([]))
+      }
+      res.redirect('/')
     })
 
     app.get('*' , (req, res) => {
