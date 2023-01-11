@@ -190,12 +190,12 @@ module.exports = {
 
 async function main() {
   await dependencyInstaller.installDependencies()
-  module.exports.createFileStructure()
 }
 
 main().then(() => {
   setTimeout(() => {
-  module.exports.webServer()
+    module.exports.createFileStructure()
+    module.exports.webServer()
   }, 1000)
 }).catch((error) => {
   console.log("error", error);
