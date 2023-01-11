@@ -97,7 +97,7 @@ module.exports = {
             
             // install python3 if it is not installed
             exec('where python', (err, stdout, stderr) => {
-              if (err) {
+              if (err || !stdout) {
                 // install python3 using winget
                 console.log('Python is not installed, installing...')
                 const pythonInstaller = spawn('winget', ['install', 'Python.Python.3.9'])
