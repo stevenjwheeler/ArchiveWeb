@@ -61,9 +61,9 @@
     }
 
     .button {
-        width: 2rem; 
-        height: 2rem; 
-        background-color: #3e4244; 
+        width: 2.5rem; 
+        height: 2.5rem; 
+        background-color: #404abe; 
         border: none; 
         outline: none; 
         border-radius: 50%; 
@@ -133,6 +133,7 @@
     <div class="title-box">
         <h1 style="margin-bottom: 0; margin-left: 2.5%;">ArchiveWeb - <%= archiveName %></h1>
         <p style="margin-left: 2.5%;">Storing the essentials since 2023</p>
+        <button class="button" onclick="refresh()" style="position: absolute; right: 0; transform: translateY(80%); margin-right: 1.5%;"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Refresh_icon.svg" style="filter: invert(100%);" /></button>
     </div>
     <% if (archiveEntries.length == 0) { %>
         <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
@@ -147,3 +148,15 @@
         <% }); %>
     </div>
 </body>
+
+<script>
+    function refresh() {
+        // send a POST request to the server to refresh the archive
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/refresh-archive", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify({
+            archiveName: "<%= archiveName %>"
+        }));
+    }
+</script>
