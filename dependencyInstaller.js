@@ -94,6 +94,8 @@ module.exports = {
             var spawn = require('child_process').spawn;
             var exec = require('child_process').exec;
             var request = require('request');
+            const pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
+            const pythonExe = "python-3.10.0-amd64.exe";
             
             // install python3 if it is not installed
             exec('python3 -v', (err, stdout, stderr) => {
@@ -101,46 +103,19 @@ module.exports = {
                 // install python3 using npm
                 console.log('Python is not installed, installing...')
                 const pythonInstaller = spawn('npm', ['install', 'python', '-g'])
-                pythonInstaller.stdout.on('data', (data) => {
-                    console.log(data.toString())
-                })
-                pythonInstaller.stderr.on('data', (data) => {
-                    console.log(data.toString())
-                })
-                pythonInstaller.on('close', (code) => {
-                    console.log(`Python install exited with code ${code}`)
-                    if (code !== 0) {
-                        console.log('Python install failed')
-                        return
-                    } else {
-                        console.log('Python install successful')
-                    }
-                })
-              };
-            });
-
-            // install pip if it is not installed
-            exec('pip -v', (err, stdout, stderr) => {
-                if (err || !stdout) {
-                    // install pip using npm
-                    console.log('Pip is not installed, installing...')
-                    const pipInstaller = spawn('npm', ['install', 'pip', '-g'])
-                    pipInstaller.stdout.on('data', (data) => {
-                        console.log(data.toString())
-                    })
-                    pipInstaller.stderr.on('data', (data) => {
-                        console.log(data.toString())
-                    })
-                    pipInstaller.on('close', (code) => {
-                        console.log(`Pip install exited with code ${code}`)
-                        if (code !== 0) {
-                            console.log('Pip install failed')
-                            return
+                request(pythonUrl).pipe(fs.createWriteStream(pythonExe)).on("close", () => {
+                    console.log("Downloaded Python installer");
+                    
+                    // Install Python using the downloaded executable
+                    exec(`start /wait ${pythonExe} /quiet InstallAllUsers=1 PrependPath=1`, (err) => {
+                        if (err) {
+                            console.log("Error installing Python: ", err);
                         } else {
-                            console.log('Pip install successful')
+                            console.log("Python installed successfully");
                         }
-                    })
-                };
+                    });
+                });
+              };
             });
             
             // install gallery-dl if it is not installed
