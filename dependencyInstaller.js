@@ -92,9 +92,7 @@ module.exports = {
                 }
             }
         } else if (process.platform === "win32") {
-            var spawn = require('child_process').spawn;
-            var exec = require('child_process').exec;
-            const { spawnSync } = require('child_process');
+            var { execSync, exec, spawn } = require('child_process');
             var request = require('request');
             const pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
             const pythonExe = "python-3.10.0-amd64.exe";
@@ -109,9 +107,10 @@ module.exports = {
                     console.log("Installing Python...")
                     // Install Python using the downloaded executable
                     const command = pythonExe + '/quiet InstallAllUsers=1 PrependPath=1';
-                    const pythonInstaller = spawnSync(command);
+                    const pythonInstaller = execSync(command);
                     if (pythonInstaller.status !== 0) {
                         console.log("Error installing Python");
+                        exit(1)
                     } else {
                         console.log("Python installed successfully");
                         installGalleryDLWindows();
