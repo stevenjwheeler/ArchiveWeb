@@ -1,21 +1,22 @@
 const fs = require("fs");
+const { execSync, exec, spawnSync } = require("child_process");
+const request = require("request");
 
 module.exports = {
   async installDependencies() {
-    const { execSync, exec } = require("child_process");
-    const request = require("request");
-    const pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
-    const pythonExe = "python-3.10.0-amd64.exe";
-
-    // install python3 if it is not installed
-    await installPython().then(() => { installGalleryDL() });
+    await this.installPython().then(() => { this.installGalleryDL() });
   },
 
   async installPython() {
+    const pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
+    const pythonExe = "python-3.10.0-amd64.exe";
+
     try {
-      await exec("python -v");
+      const result = spawnSync("python", ["-v"]);
+      if (result.status !== 0) {
+        throw new Error("Python is not installed");
+      }
     } catch (err) {
-      console.log("Python is not installed, installing...");
       await new Promise((resolve, reject) => {
         console.log("Python is not installed, installing...");
         request(pythonUrl)
@@ -38,15 +39,15 @@ module.exports = {
 
   async installGalleryDL() {
     try {
-      const { stdout } = await exec("pip list");
-      if (stdout.toString().includes("gallery-dl")) {
-        return;
-      } else {
-        console.log("Gallery-dl is not installed, installing...");
-        // use pip to install gallery-dl
-        await execSync("pip install gallery-dl");
-        console.log("Gallery-dl install successful");
-      }
+      exec("pip list", (error, stdout, stderr) => {
+        if (stderr.includes("gallery-dl")) {
+          return;
+        } else {
+          console.log("Gallery-dl is not installed, installing...");
+          execSync("pip install gallery-dl");
+          console.log("Gallery-dl install successful");
+        }
+      });
     } catch (err) {
       console.error("Failed to install gallery-dl: ", err);
       process.exit(1);
