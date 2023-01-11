@@ -98,9 +98,9 @@ module.exports = {
             // install python3 if it is not installed
             exec('where python', (err, stdout, stderr) => {
               if (err || !stdout) {
-                // install python3 using winget
+                // install python3 using npm
                 console.log('Python is not installed, installing...')
-                const pythonInstaller = spawn('winget', ['install', 'Python.Python.3.9'])
+                const pythonInstaller = spawn('npm', ['install', 'python', '-g'])
                 pythonInstaller.stdout.on('data', (data) => {
                     console.log(data.toString())
                 })
@@ -122,9 +122,9 @@ module.exports = {
             // install pip if it is not installed
             exec('where pip', (err, stdout, stderr) => {
                 if (err || !stdout) {
-                    // install pip using winget
+                    // install pip using npm
                     console.log('Pip is not installed, installing...')
-                    const pipInstaller = spawn('winget', ['install', 'Python.Python.Pip'])
+                    const pipInstaller = spawn('npm', ['install', 'pip', '-g'])
                     pipInstaller.stdout.on('data', (data) => {
                         console.log(data.toString())
                     })
