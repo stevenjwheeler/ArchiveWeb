@@ -3,8 +3,6 @@ const path = require('path')
 const fs = require('fs')
 const packagejson = require('./package.json')
 const importer = require('./importer.js')
-const dependencyInstallerLinux = require('./dependencyInstaller-Linux.js')
-const dependencyInstallerWindows = require('./dependencyInstaller-Windows.js')
 
 module.exports = {
   async webServer () {
@@ -170,36 +168,6 @@ module.exports = {
     })
 
     // start the web server
-    app.listen(port, () => {
-      console.log(`Server is listening on port ${port}`)
-    })
-  },
-
-  async createFileStructure() {
-    // create the file structure
-    const archiveDir = path.join(__dirname, 'datastructure')
-    if (!fs.existsSync(archiveDir)) {
-      fs.mkdirSync(archiveDir)
-    }
-    // create the archive list
-    const archiveListPath = path.join(archiveDir, 'archiveList.json')
-    if (!fs.existsSync(archiveListPath)) {
-      fs.writeFileSync(archiveListPath, JSON.stringify([]))
-    }
+    app.listen(port)
   }
 }
-
-async function main() {
-  if (process.platform === "linux") {
-    await dependencyInstallerLinux.installDependencies()
-  } else if (process.platform === "win32") {
-    await dependencyInstallerWindows.installDependencies()
-  } else {
-    throw new Error("Unsupported platform")
-  }
-}
-
-main().then(() => {
-  module.exports.createFileStructure()
-  module.exports.webServer()
-})
