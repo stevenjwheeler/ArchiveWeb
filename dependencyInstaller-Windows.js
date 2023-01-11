@@ -8,6 +8,10 @@ module.exports = {
     const pythonExe = "python-3.10.0-amd64.exe";
 
     // install python3 if it is not installed
+    await installPython().then(() => { installGalleryDL() });
+  },
+
+  async installPython() {
     try {
       await exec("python -v");
     } catch (err) {
@@ -30,10 +34,12 @@ module.exports = {
           });
       });
     }
+  },
 
+  async installGalleryDL() {
     try {
       const { stdout } = await exec("pip list");
-      if (stdout.includes("gallery-dl")) {
+      if (stdout.toString().includes("gallery-dl")) {
         return;
       } else {
         console.log("Gallery-dl is not installed, installing...");
@@ -45,5 +51,5 @@ module.exports = {
       console.error("Failed to install gallery-dl: ", err);
       process.exit(1);
     }
-  },
+  }
 };
