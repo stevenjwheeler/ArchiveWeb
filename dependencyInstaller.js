@@ -118,10 +118,34 @@ module.exports = {
                 })
               };
             });
+
+            // install pip if it is not installed
+            exec('where pip', (err, stdout, stderr) => {
+                if (err || !stdout) {
+                    // install pip using winget
+                    console.log('Pip is not installed, installing...')
+                    const pipInstaller = spawn('winget', ['install', 'Python.Python.Pip'])
+                    pipInstaller.stdout.on('data', (data) => {
+                        console.log(data.toString())
+                    })
+                    pipInstaller.stderr.on('data', (data) => {
+                        console.log(data.toString())
+                    })
+                    pipInstaller.on('close', (code) => {
+                        console.log(`Pip install exited with code ${code}`)
+                        if (code !== 0) {
+                            console.log('Pip install failed')
+                            return
+                        } else {
+                            console.log('Pip install successful')
+                        }
+                    })
+                };
+            });
             
             // install gallery-dl if it is not installed
             exec('where gallery-dl', (err, stdout, stderr) => {
-              if (err) {
+              if (err || !stdout) {
                 console.log('Gallery-dl is not installed, installing...')
                 // use pip to install gallery-dl
                 const galleryDlInstall = spawn('pip', ['install', 'gallery-dl'])
