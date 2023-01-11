@@ -109,13 +109,13 @@ module.exports = {
                 })
                 pythonInstaller.on('close', (code) => {
                     console.log(`Python install exited with code ${code}`)
+                    if (code !== 0) {
+                        console.log('Python install failed')
+                        return
+                    } else {
+                        console.log('Python install successful')
+                    }
                 })
-                if (code !== 0) {
-                    console.log('Python install failed')
-                    return
-                } else {
-                    console.log('Python install successful')
-                }
               };
             });
             
@@ -134,13 +134,13 @@ module.exports = {
                 })
                 galleryDlInstall.on('close', (code) => {
                   console.log(`Gallery-dl install exited with code ${code}`)
-                })
-                if (code !== 0) {
+                  if (code !== 0) {
                     console.log('Gallery-dl install failed')
                     return
-                } else {
+                  } else {
                     console.log('Gallery-dl install successful')
-                }
+                  }
+                })
               };
             });
         } else {
