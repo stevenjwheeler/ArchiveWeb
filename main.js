@@ -197,8 +197,9 @@ async function main() {
   } else {
     throw new Error("Unsupported platform")
   }
-  module.exports.createFileStructure()
-  module.exports.webServer()
 }
 
-main()
+main().then(() => {
+  module.exports.createFileStructure()
+  module.exports.webServer()
+})

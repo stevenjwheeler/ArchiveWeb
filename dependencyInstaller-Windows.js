@@ -4,11 +4,14 @@ const request = require("request");
 
 module.exports = {
   async installDependencies() {
-    await this.installPython().then(() => { this.installGalleryDL() });
+    await this.installPython().then(() => {
+      this.installGalleryDL();
+    });
   },
 
   async installPython() {
-    const pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
+    const pythonUrl =
+      "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
     const pythonExe = "python-3.10.0-amd64.exe";
 
     try {
@@ -38,19 +41,22 @@ module.exports = {
   },
 
   async installGalleryDL() {
-    try {
-      exec("pip list", (error, stdout, stderr) => {
-        if (stderr.includes("gallery-dl")) {
-          return;
-        } else {
+    exec("pip list", async (error, stdout, stderr) => {
+      if (stderr.includes("gallery-dl")) {
+        return;
+      } else {
+        await new Promise((resolve, reject) => {
           console.log("Gallery-dl is not installed, installing...");
-          execSync("pip install gallery-dl");
+          try {
+            execSync("pip install gallery-dl");
+          } catch (err) {
+            reject(err);
+            process.exit(1);
+          }
           console.log("Gallery-dl install successful");
-        }
-      });
-    } catch (err) {
-      console.error("Failed to install gallery-dl: ", err);
-      process.exit(1);
-    }
-  }
+          resolve();
+        });
+      }
+    });
+  },
 };
