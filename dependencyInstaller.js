@@ -102,7 +102,6 @@ module.exports = {
               if (err || !stdout) {
                 // install python3 using npm
                 console.log('Python is not installed, installing...')
-                const pythonInstaller = spawn('npm', ['install', 'python', '-g'])
                 request(pythonUrl).pipe(fs.createWriteStream(pythonExe)).on("close", () => {
                     console.log("Downloaded Python installer");
                     
