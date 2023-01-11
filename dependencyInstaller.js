@@ -105,7 +105,7 @@ module.exports = {
                 request(pythonUrl).pipe(fs.createWriteStream(pythonExe)).on("close", () => {
                     console.log("Downloaded Python installer");
                     // Install Python using the downloaded executable
-                    const pythonInstaller = exec(pythonExe, ['/quiet', 'InstallAllUsers=1', 'PrependPath=1'], (err) => {
+                    const pythonInstaller = exec(pythonExe, '/quiet', 'InstallAllUsers=1', 'PrependPath=1', (err) => {
                         if (err) {
                             console.log("Error installing Python: ", err);
                         } else {
@@ -113,11 +113,11 @@ module.exports = {
                         }
                     });
                     pythonInstaller.on('exit', function (code, signal) {
-                        this.installGalleryDLWindows();
+                        installGalleryDLWindows();
                     });
                 });
               } else {
-                this.installGalleryDLWindows();
+                installGalleryDLWindows();
               }
             });
         } else {
