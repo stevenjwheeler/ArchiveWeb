@@ -15,15 +15,13 @@ module.exports = {
         console.log(data.toString());
       });
       pythonInstall.on("close", (code) => {
-        console.log(`Python3 install exited with code ${code}`);
+        if (code !== 0) {
+          console.log("Python3 install failed");
+          process.exit(1);
+        } else {
+          console.log("Python3 install successful");
+        }
       });
-
-      if (code !== 0) {
-        console.log("Python3 install failed");
-        process.exit(1)
-      } else {
-        console.log("Python3 install successful");
-      }
     }
 
     // install python3-pip if it is not installed
@@ -37,15 +35,13 @@ module.exports = {
         console.log(data.toString());
       });
       pipInstall.on("close", (code) => {
-        console.log(`Python3-pip install exited with code ${code}`);
+        if (code !== 0) {
+          console.log("Python3-pip install failed");
+          process.exit(1);
+        } else {
+          console.log("Python3-pip install successful");
+        }
       });
-
-      if (code !== 0) {
-        console.log("Python3-pip install failed");
-        process.exit(1)
-      } else {
-        console.log("Python3-pip install successful");
-      }
     }
 
     // install python3-venv if it is not installed
@@ -64,15 +60,13 @@ module.exports = {
         console.log(data.toString());
       });
       venvInstall.on("close", (code) => {
-        console.log(`Python3-venv install exited with code ${code}`);
+        if (code !== 0) {
+          console.log("Python3-venv install failed");
+          process.exit(1);
+        } else {
+          console.log("Python3-venv install successful");
+        }
       });
-
-      if (code !== 0) {
-        console.log("Python3-venv install failed");
-        process.exit(1)
-      } else {
-        console.log("Python3-venv install successful");
-      }
     }
 
     // install gallery-dl if it is not installed
@@ -86,14 +80,13 @@ module.exports = {
         console.log(data.toString());
       });
       galleryDlInstall.on("close", (code) => {
-        console.log(`Gallery-dl install exited with code ${code}`);
+        if (code !== 0) {
+          console.log("Gallery-dl install failed");
+          process.exit(1);
+        } else {
+          console.log("Gallery-dl install successful");
+        }
       });
-      if (code !== 0) {
-        console.log("Gallery-dl install failed");
-        process.exit(1)
-      } else {
-        console.log("Gallery-dl install successful");
-      }
     }
   },
 };
