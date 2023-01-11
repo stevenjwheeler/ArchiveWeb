@@ -94,7 +94,7 @@ module.exports = {
         } else if (process.platform === "win32") {
             var spawn = require('child_process').spawn;
             var exec = require('child_process').exec;
-            var spawnSync = require('child_process');
+            const { spawnSync } = require('child_process');
             var request = require('request');
             const pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe";
             const pythonExe = "python-3.10.0-amd64.exe";
