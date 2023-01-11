@@ -3,7 +3,8 @@ const path = require('path')
 const fs = require('fs')
 const packagejson = require('./package.json')
 const importer = require('./importer.js')
-const dependencyInstaller = require('./dependencyInstaller.js')
+const dependencyInstallerLinux = require('./dependencyInstaller-Linux.js')
+const dependencyInstallerWindows = require('./dependencyInstaller-Windows.js')
 
 module.exports = {
   async webServer () {
@@ -189,14 +190,15 @@ module.exports = {
 }
 
 async function main() {
-  await dependencyInstaller.installDependencies()
+  if (process.platform === "linux") {
+    await dependencyInstallerLinux.installDependencies()
+  } else if (process.platform === "win32") {
+    await dependencyInstallerWindows.installDependencies()
+  } else {
+    throw new Error("Unsupported platform")
+  }
+  module.exports.createFileStructure()
+  module.exports.webServer()
 }
 
-main().then(() => {
-  setTimeout(() => {
-    module.exports.createFileStructure()
-    module.exports.webServer()
-  }, 1000)
-}).catch((error) => {
-  console.log("error", error);
-});
+main()
