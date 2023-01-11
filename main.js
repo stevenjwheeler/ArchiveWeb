@@ -1,6 +1,9 @@
 const express = require('express')
 const path = require('path')
 const fs = require('fs')
+const packagejson = require('./package.json')
+const importer = require('./importer.js')
+const dependencyInstaller = require('./dependencyInstaller.js')
 
 module.exports = {
   async webServer () {
@@ -8,7 +11,9 @@ module.exports = {
     const app = express()
     app.set('view engine', 'html')
     app.engine('html', require('ejs').renderFile)
-    app.use(express.urlencoded({ extended: true }))
+    var bodyParser = require('body-parser');
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
     app.set('views', path.join(__dirname))
     console.log(__dirname)
     const port = 3000
@@ -38,7 +43,7 @@ module.exports = {
     app.get('/settings/:option', (req, res) => {
       const option = req.params.option
       if (option === 'menu') {
-        res.render('settings/settingsMenu.html')
+        res.render('settings/settingsMenu.html', {version: packagejson.version})
       }
       if (option === 'createArchive') {
         res.render('settings/createArchive.html', {error: ''})
@@ -73,6 +78,22 @@ module.exports = {
         }
       }
       res.render('./settings/changeArchiveSource', {archiveList: archiveList, error: 'Please select an archive to change the source of'})
+    })
+
+    app.post('/refresh-archive', (req, res) => {
+      const archiveName = req.body.archiveName
+      for (let i = 0; i < archiveList.length; i++) {
+        if (archiveList[i][0] === archiveName) {
+          const archiveSource = archiveList[i][1]
+          const cookies = archiveList[i][2]
+          const archivePath = path.join(__dirname, 'datastructure', archiveName, 'archiveDatabase.json')
+          const archiveDatabase = JSON.parse(fs.readFileSync(archiveDatabasePath))
+
+          // run the importer
+          importer.runImport(archiveSource, cookies, archivePath, archiveDatabase);
+        }
+      }
+      res.redirect('/')
     })
 
     app.post('/submit-rename', (req, res) => {
@@ -167,5 +188,15 @@ module.exports = {
   }
 }
 
-module.exports.createFileStructure()
-module.exports.webServer()
+async function main() {
+  await dependencyInstaller.installDependencies()
+  module.exports.createFileStructure()
+}
+
+main().then(() => {
+  setTimeout(() => {
+  module.exports.webServer()
+  }, 1000)
+}).catch((error) => {
+  console.log("error", error);
+});
