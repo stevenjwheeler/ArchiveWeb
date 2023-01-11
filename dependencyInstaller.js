@@ -96,7 +96,7 @@ module.exports = {
             var request = require('request');
             
             // install python3 if it is not installed
-            exec('where python', (err, stdout, stderr) => {
+            exec('python3 -v', (err, stdout, stderr) => {
               if (err || !stdout) {
                 // install python3 using npm
                 console.log('Python is not installed, installing...')
@@ -120,7 +120,7 @@ module.exports = {
             });
 
             // install pip if it is not installed
-            exec('where pip', (err, stdout, stderr) => {
+            exec('pip -v', (err, stdout, stderr) => {
                 if (err || !stdout) {
                     // install pip using npm
                     console.log('Pip is not installed, installing...')
@@ -143,7 +143,30 @@ module.exports = {
                 };
             });
             
-            
+            // install gallery-dl if it is not installed
+            exec('where gallery-dl', (err, stdout, stderr) => {
+              if (err || !stdout) {
+                console.log('Gallery-dl is not installed, installing...')
+                // use pip to install gallery-dl
+                const galleryDlInstall = spawn('pip', ['install', 'gallery-dl'])
+
+                galleryDlInstall.stdout.on('data', (data) => {
+                  console.log(data.toString())
+                })
+                galleryDlInstall.stderr.on('data', (data) => {
+                  console.log(data.toString())
+                })
+                galleryDlInstall.on('close', (code) => {
+                  console.log(`Gallery-dl install exited with code ${code}`)
+                  if (code !== 0) {
+                    console.log('Gallery-dl install failed')
+                    return
+                  } else {
+                    console.log('Gallery-dl install successful')
+                  }
+                })
+              };
+            });
         } else {
             console.log('Unsupported platform')
         }
