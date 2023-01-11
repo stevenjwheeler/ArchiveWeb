@@ -108,9 +108,9 @@ module.exports = {
                     // Install Python using the downloaded executable
                     const command = pythonExe + '/quiet InstallAllUsers=1 PrependPath=1';
                     const pythonInstaller = execSync(command);
+                    console.log(pythonInstaller)
                     if (pythonInstaller.status !== 0) {
                         console.log("Error installing Python");
-                        exit(1)
                     } else {
                         console.log("Python installed successfully");
                         installGalleryDLWindows();
