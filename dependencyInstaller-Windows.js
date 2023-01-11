@@ -42,7 +42,7 @@ module.exports = {
 
   async installGalleryDL() {
     exec("pip list", async (error, stdout, stderr) => {
-      if (stderr.includes("gallery-dl")) {
+      if (stdout.includes("gallery-dl")) {
         return;
       } else {
         await new Promise((resolve, reject) => {
