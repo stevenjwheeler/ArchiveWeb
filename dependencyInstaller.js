@@ -144,7 +144,7 @@ module.exports = {
             });
             
             // install gallery-dl if it is not installed
-            exec('where gallery-dl', (err, stdout, stderr) => {
+            exec('gallery-dl', (err, stdout, stderr) => {
               if (err || !stdout) {
                 console.log('Gallery-dl is not installed, installing...')
                 // use pip to install gallery-dl
