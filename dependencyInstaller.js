@@ -1,3 +1,4 @@
+const { spawnSync } = require('child_process')
 const fs = require('fs')
 
 module.exports = {
@@ -104,17 +105,16 @@ module.exports = {
                 console.log('Python is not installed, installing...')
                 request(pythonUrl).pipe(fs.createWriteStream(pythonExe)).on("close", () => {
                     console.log("Downloaded Python installer");
+                    console.log("Installing Python...")
                     // Install Python using the downloaded executable
-                    const pythonInstaller = exec(pythonExe + '/quiet InstallAllUsers=1 PrependPath=1', (err) => {
-                        if (err) {
-                            console.log("Error installing Python: ", err);
-                        } else {
-                            console.log("Python installed successfully");
-                        }
-                    });
-                    pythonInstaller.on('exit', function (code, signal) {
+                    const pythonInstaller = spawnSync(pythonExe + '/quiet InstallAllUsers=1 PrependPath=1', (err) => {
+                    if (pythonInstaller.status !== 0) {
+                        console.log("Error installing Python: ", pythonInstaller.stderr.toString());
+                    } else {
+                        console.log("Python installed successfully");
                         installGalleryDLWindows();
-                    });
+                    }
+                  });
                 });
               } else {
                 installGalleryDLWindows();
