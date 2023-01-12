@@ -4,8 +4,8 @@ const request = require("request");
 
 module.exports = {
   async installDependencies() {
-    await this.installPython().then(() => {
-      this.installGalleryDL();
+    await this.installPython().then(async () => {
+      await this.installGalleryDL();
     });
   },
 
