@@ -5,7 +5,7 @@ const packagejson = require('./package.json')
 const importer = require('./importer.js')
 
 module.exports = {
-  async webServer () {
+  async webServer (port) {
     // create an express web server
     const app = express()
     app.set('view engine', 'html')
@@ -14,8 +14,6 @@ module.exports = {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.set('views', path.join(__dirname))
-    console.log(__dirname)
-    const port = 3000
 
     // get the archive list
     const archiveListPath = path.join(__dirname, 'datastructure', 'archiveList.json')
