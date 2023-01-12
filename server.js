@@ -10,7 +10,7 @@ module.exports = {
     const app = express()
     app.set('view engine', 'html')
     app.engine('html', require('ejs').renderFile)
-    var bodyParser = require('body-parser');
+    const bodyParser = require('body-parser');
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.set('views', path.join(__dirname))
