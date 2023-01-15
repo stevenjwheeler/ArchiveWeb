@@ -28,52 +28,6 @@ module.exports = {
       console.log(error);
     }
 
-   /*  // install python3-pip if it is not installed
-    if (!fs.existsSync("/usr/bin/pip3")) {
-      console.log("Installing python3-pip...");
-      const pipInstall = spawn("sudo", ["apt", "install", "python3-pip", "-y"]);
-      pipInstall.stdout.on("data", (data) => {
-        console.log(data.toString());
-      });
-      pipInstall.stderr.on("data", (data) => {
-        console.log(data.toString());
-      });
-      pipInstall.on("close", (code) => {
-        if (code !== 0) {
-          console.log("Python3-pip install failed");
-          process.exit(1);
-        } else {
-          console.log("Python3-pip install successful");
-        }
-      });
-    }
-
-    // install python3-venv if it is not installed
-    if (!fs.existsSync("/usr/bin/python3-venv")) {
-      console.log("Installing python3-venv...");
-      const venvInstall = spawn("sudo", [
-        "apt",
-        "install",
-        "python3-venv",
-        "-y",
-      ]);
-      venvInstall.stdout.on("data", (data) => {
-        console.log(data.toString());
-      });
-      venvInstall.stderr.on("data", (data) => {
-        console.log(data.toString());
-      });
-      venvInstall.on("close", (code) => {
-        if (code !== 0) {
-          console.log("Python3-venv install failed");
-          process.exit(1);
-        } else {
-          console.log("Python3-venv install successful");
-        }
-      });
-    }
- */
-
     // install gallery-dl if it is not installed
     try {
       if (!fs.existsSync("/usr/local/bin/gallery-dl")) {
