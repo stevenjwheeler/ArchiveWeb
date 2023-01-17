@@ -57,6 +57,9 @@ module.exports = {
                 folders[i] + "/" + files[j];
             }
             if (!files[j].endsWith(".json")) {
+              if (files[j].includes("_preview")) {
+                continue;
+              }
               // check if full path is already anywhere in the archiveDatabase
               let pathExists = false;
               for (let l = 0; l < archiveEntries.length; l++) {
