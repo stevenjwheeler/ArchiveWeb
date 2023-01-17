@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <style>
     body {
         margin: 0;
@@ -13,6 +15,24 @@
         display: flex;
         flex-direction: column;
         border-bottom: #3e4244 1px solid;
+    }
+
+    .title-box-grid {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 1fr 0.1fr;
+        grid-template-rows: 1fr;
+        grid-gap: 10px;
+        margin-left: 2%;
+        margin-right: 2%;
+        margin-bottom: 1%;
+        margin-top: 0.5%;
+    }
+
+    .refresh-entry-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
     }
 
     .content-grid {
@@ -65,7 +85,7 @@
         overflow-wrap: break-word;
     }
 
-    .button {
+    .refresh-button {
         width: 2.5rem; 
         height: 2.5rem; 
         background-color: #404abe; 
@@ -75,7 +95,7 @@
         cursor: pointer;
     }
 
-    .button:hover {
+    .refresh-button:hover {
         background-color: #5865f2;
     }
 
@@ -132,110 +152,143 @@
         overflow: hidden;
         margin-bottom: auto;
     }
-</style>
-  
-<noscript>
-    <div class="javascript-error-background">
-        <div class="javascript-error">
-            This web app requires JavaScript to be enabled in order to function properly.<br>
-            Please enable JavaScript in your browser settings or unblock scripts, and try again.
-        </div>
-    </div>
-</noscript>
 
-<script language="JavaScript" type="text/javascript" src="/js/jquery-3.6.3.min.js"></script>
+    @keyframes button-loading-spinner {
+        from {
+            transform: rotate(0turn);
+        }
 
-<script>
-    function refresh() {
-        // send a POST request to the server to refresh the archive
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/refresh-archive", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify({
-            archiveName: "<%= archiveName %>"
-        }));
+        to {
+            transform: rotate(-1turn);
+        }
     }
-</script>
 
-<head>
-    <title>ArchiveWeb - <%= archiveName %></title>
-</head>
+    .button-loading-spinner {
+        animation: button-loading-spinner 1s ease infinite;
+    }
 
-<body>
-    <div class="title-box">
-        <h1 style="margin-bottom: 0; margin-left: 2.5%;">ArchiveWeb - <%= archiveName %></h1>
-        <p style="margin-left: 2.5%;">Storing the essentials since 2023</p>
-        <button class="button" onclick="refresh()" style="position: absolute; right: 0; transform: translateY(120%); margin-right: 1.5%;"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Refresh_icon.svg" style="filter: invert(100%);" /></button>
-        <p id="entrycount" style="position: absolute; right: 0; margin-right: 1.5%;"></p>
-    </div>
-    <% if (archiveEntries.length == 0) { %>
-        <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
-        <br>Click refresh to gather new entries!</p>
-    <% } %>
-    <div class="content-grid">
-        <!-- for each item in each folder of the archive entries -->
-        <% let i = 0; archiveEntries.forEach(function(item) { %>
-            <% i++ %>
-            <div class="content">
-                <!-- display the user information -->
-                <div class="user-box">
-                    <img class="avatar-image" id=<%= "avatar-" + i %>>
-                    <p class="username-text" id=<%= "user-" + i %>>
-                </div>
-                
-                <!-- display the content -->
-                <p class="content-text" id=<%= "data-" + i %>>
-                
-                <!-- display the media -->
-                <div class="image-grid">
-                    <% item.mediaFiles.forEach(function(mediaFile) { 
-                        if (mediaFile.endsWith(".jpg" || ".png")) { 
-                            let split = mediaFile.split(".");
-                            let previewImage = split[0] + "_preview." + split[1];
-                    %>
-                        <div class="image-grid-item">
-                            <img src="<%= '../datastructure/' + archiveName + '/assets/' + previewImage %>" style="width: 100%;"/>
-                        </div>
-                        <% } else if (mediaFile.endsWith(".mp4")) { %>
-                        <div class="image-grid-item">
-                            <video autoplay muted loop style="width: 100%;">
-                                <source src="<%= '../datastructure/' + archiveName + '/assets/' + mediaFile %>" type="video/mp4">
-                            </video>
-                        </div>
-                        <% } %>
-                    <% }); %>
-                </div>
+</style>
 
-                <!-- request the json file using the getJson() function using JQuery -->
-                <script>
-                    try {
-                        const path = "../datastructure/" + `<%= archiveName %>`.toString() + "/assets/" + `<%= item.informationFile %>`.toString();
-                        $(document).ready($.getJSON(path, function(data) {
-                            document.getElementById("avatar-" + <%= i %>).src = data.author.profile_image;
-                            document.getElementById("user-" + <%= i %>).innerHTML = "@" + data.author.name;
-                            document.getElementById("data-" + <%= i %>).innerHTML = data.content;
-                        }));
-                    } catch (error) {
-                        console.log(error);
-                    }
-                </script>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ArchiveWeb - <%= archiveName %></title>
+    </head>
+
+    <noscript>
+        <div class="javascript-error-background">
+            <div class="javascript-error">
+                This web app requires JavaScript to be enabled in order to function properly.<br>
+                Please enable JavaScript in your browser settings or unblock scripts, and try again.
             </div>
-        <% }); 
-        %>
-        <script>
+        </div>
+    </noscript>
+
+    <script language="JavaScript" type="text/javascript" src="/js/jquery-3.6.3.min.js"></script>
+
+    <script>
+        function refresh() {
+            const refreshButton = document.querySelector(".refresh-button");
+            // disable the refresh button for more clicks
+            refreshButton.disabled = true;
+            // set the style so that it is no longer a pointer cursor
+            refreshButton.style.cursor = "default";
+            // remove the hover effect
+            refreshButton.style.backgroundColor = "#404abe";
+
+            // add a loading spinner to the refresh button
+            refreshButton.classList.add("button-loading-spinner");
+            
+            // send a POST request to the server to refresh the archive
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/refresh-archive", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify({
+                archiveName: "<%= archiveName %>"
+            }));
+
+            // wait for the server to respond with a 200 OK
+            xhr.onreadystatechange = function() {
+                if (xhr.status == 200) {
+                    // reload the page
+                    location.reload();
+                }
+            }
+        }
+
+        function loadImages() {
+            const images = document.querySelectorAll(".media-image");
+    
+            const options = {
+            root: null,
+            rootMargin: "0px",
+            threshold: 0
+            };
+    
+            const observer = new IntersectionObserver(onIntersection, options);
+    
+            images.forEach(image => {
+            observer.observe(image);
+            });
+    
+            function onIntersection(entries) {
+                entries.forEach(entry => {
+                if (entry.intersectionRatio > 0) {
+                    entry.target.src = entry.target.dataset.src;
+                    observer.unobserve(entry.target);
+                }
+                });
+            }
+        }
+
+        function loadVideos() {
+            const sources = document.querySelectorAll(".media-video");
+
+            const options = {
+                root: null,
+                rootMargin: "0px",
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver(onIntersection, options);
+
+            sources.forEach(source => {
+                observer.observe(source);
+            });
+
+            function onIntersection(entries) {
+                entries.forEach(entry => {
+                if (entry.intersectionRatio > 0) {
+                    entry.target.src = entry.target.dataset.src;
+                    observer.unobserve(entry.target);
+                }
+                });
+            }
+        }
+
+        function checkAvatarImages() {
             // if avatar images are not loaded, use the default image
             const avatarImages = document.querySelectorAll('.avatar-image');
             var avatarArray = [...avatarImages];
 
             avatarArray.forEach(avatarImage => {
-                // if src 404s, use the default image
-                var http = new XMLHttpRequest();
-                http.open('HEAD', avatarImage.src, false);
-                http.send();
-                if (http.status == 404)
-                    avatarImage.src = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
-            });
+                // do a async request to check if the image exists
+                var xhr = new XMLHttpRequest();
+                xhr.open("HEAD", avatarImage.src, true);
+                xhr.send();
 
+                xhr.onreadystatechange = function() {
+                    if (this.readyState == this.DONE) {
+                        if (this.status == 404) {
+                            avatarImage.src = "/assets/default-avatar.png";
+                        }
+                    }
+                }
+            });
+        }
+
+        function moveImages() {
             const imageGrid = document.querySelectorAll('.image-grid');
             var gridArray = [...imageGrid];
 
@@ -259,13 +312,84 @@
                 }
 
                 imageGridItems.forEach(imageGridItem => {
-                        // stretch the image to fit the grid
-                        imageGridItem.style.width = '100%';
-                        imageGridItem.style.height = '100%';
+                    // stretch the image to fit the grid
+                    imageGridItem.style.width = '100%';
+                    imageGridItem.style.height = '100%';
                 });
             });
+        }
+    </script>
 
-            document.getElementById("entrycount").innerHTML = <%= i %> + " entries";
-        </script>
-    </div>
-</body>
+    <body onload="checkAvatarImages(), loadImages(), loadVideos(), moveImages()">
+        <div class="title-box">
+            <!-- create a grid of 1 row 2 columns that has the h1 and p in one side the button and entrycount in the other -->
+            <div class="title-box-grid">
+                <div>
+                    <h1><%= archiveName %></h1>
+                </div>
+                <div>
+                    <div class="refresh-entry-info">
+                        <p id="entrycount" style="text-align: right;"></p>
+                        <button class="refresh-button" onclick="refresh()"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Refresh_icon.svg" style="filter: invert(100%);" /></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% if (archiveEntries.length == 0) { %>
+            <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
+            <br>Click refresh to gather new entries!</p>
+        <% } %>
+        <div class="content-grid">
+            <!-- for each item in each folder of the archive entries -->
+            <% let i = 0; archiveEntries.forEach(function(item) { %>
+                <% i++ %>
+                <div class="content">
+                    <!-- display the user information -->
+                    <div class="user-box">
+                        <img class="avatar-image" id=<%= "avatar-" + i %>>
+                        <p class="username-text" id=<%= "user-" + i %>>
+                    </div>
+                    
+                    <!-- display the content -->
+                    <p class="content-text" id=<%= "data-" + i %>>
+                    
+                    <!-- display the media -->
+                    <div class="image-grid">
+                        <% item.mediaFiles.forEach(function(mediaFile) { 
+                            if (mediaFile.endsWith(".jpg" || ".png")) { 
+                                let split = mediaFile.split(".");
+                                let previewImage = split[0] + "_preview." + split[1];
+                        %>
+                            <div class="image-grid-item">
+                                <img class=media-image data-src="<%= '../datastructure/' + archiveName + '/assets/' + previewImage %>" style="width: 100%;"/>
+                            </div>
+                            <% } else if (mediaFile.endsWith(".mp4")) { %>
+                            <div class="image-grid-item">
+                                <video class=media-video autoplay muted loop style="width: 100%;" data-src="<%= '../datastructure/' + archiveName + '/assets/' + mediaFile %>" type="video/mp4"/>
+                            </div>
+                            <% } %>
+                        <% }); %>
+                    </div>
+
+                    <!-- request the json file using the getJson() function using JQuery -->
+                    <script>
+                        try {
+                            const path = "../datastructure/" + `<%= archiveName %>`.toString() + "/assets/" + `<%= item.informationFile %>`.toString();
+                            $(document).ready($.getJSON(path, function(data) {
+                                document.getElementById("avatar-" + <%= i %>).src = data.author.profile_image;
+                                document.getElementById("user-" + <%= i %>).innerHTML = "@" + data.author.name;
+                                document.getElementById("data-" + <%= i %>).innerHTML = data.content;
+                            }));
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    </script>
+                </div>
+            <% }); 
+            %>
+            <script>
+                document.getElementById("entrycount").innerHTML = <%= i %> + " entries";
+            </script>
+        </div>
+    </body>
+</html>
