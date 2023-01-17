@@ -12,6 +12,7 @@ module.exports = {
     app.set('view engine', 'html')
     app.engine('html', require('ejs').renderFile)
     app.use(express.static(path.join(__dirname, 'datastructure')))
+    app.use(express.static(path.join(__dirname, 'assets')))
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: true }));
     app.set('views', path.join(__dirname))
@@ -30,6 +31,12 @@ module.exports = {
       const folder = req.params.folder
       const file = req.params.file
       const filePath = path.join(__dirname, 'datastructure', archive, 'assets', folder, file)
+      res.sendFile(filePath)
+    })
+
+    app.get('/assets/:file', (req, res) => {
+      const file = req.params.file
+      const filePath = path.join(__dirname, 'assets', file)
       res.sendFile(filePath)
     })
 
@@ -71,9 +78,9 @@ module.exports = {
       }
     })
 
-    //app.get('*' , (req, res) => {
-      //res.redirect('/')
-    //})
+    app.get('*' , (req, res) => {
+      res.redirect('/')
+    })
 
     // set up the routes for posting data
     app.post('/submit-source', (req, res) => {
@@ -99,10 +106,11 @@ module.exports = {
           const archiveSource = archiveList[i][1]
           const cookies = archiveList[i][2]
 
-          importer.runImport(archiveName);
+          importer.runImport(archiveName).then(() => {
+            res.status(200).send('Archive refreshed');
+          });
         }
       }
-      res.redirect('/')
     })
 
     app.post('/submit-rename', (req, res) => {
