@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const packagejson = require('./package.json')
 const importer = require('./importer.js')
+const bodyParser = require('body-parser');
 
 module.exports = {
   async webServer (port) {
@@ -10,8 +11,8 @@ module.exports = {
     const app = express()
     app.set('view engine', 'html')
     app.engine('html', require('ejs').renderFile)
-    const bodyParser = require('body-parser');
-    app.use(bodyParser.json());
+    app.use(express.static(path.join(__dirname, 'datastructure')))
+    app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: true }));
     app.set('views', path.join(__dirname))
 
@@ -22,6 +23,20 @@ module.exports = {
     // set up the routes for getting pages
     app.get('/', (req, res) => {
       res.render('menu.html', {archiveList: archiveList})
+    })
+
+    app.get('/datastructure/:archive/assets/:folder/:file', (req, res) => {
+      const archive = req.params.archive
+      const folder = req.params.folder
+      const file = req.params.file
+      const filePath = path.join(__dirname, 'datastructure', archive, 'assets', folder, file)
+      res.sendFile(filePath)
+    })
+
+    app.get('/js/:file', (req, res) => {
+      const file = req.params.file
+      const filePath = path.join(__dirname, 'js', file)
+      res.sendFile(filePath)
     })
 
     app.get('/archive/:archiveName', (req, res) => {
@@ -56,9 +71,9 @@ module.exports = {
       }
     })
 
-    app.get('*' , (req, res) => {
-      res.redirect('/')
-    })
+    //app.get('*' , (req, res) => {
+      //res.redirect('/')
+    //})
 
     // set up the routes for posting data
     app.post('/submit-source', (req, res) => {
@@ -83,11 +98,8 @@ module.exports = {
         if (archiveList[i][0] === archiveName) {
           const archiveSource = archiveList[i][1]
           const cookies = archiveList[i][2]
-          const archivePath = path.join(__dirname, 'datastructure', archiveName, 'archiveDatabase.json')
-          const archiveDatabase = JSON.parse(fs.readFileSync(archiveDatabasePath))
 
-          // run the importer
-          importer.runImport(archiveSource, cookies, archivePath, archiveDatabase);
+          importer.runImport(archiveName);
         }
       }
       res.redirect('/')
