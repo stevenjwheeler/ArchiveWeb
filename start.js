@@ -62,11 +62,11 @@ async function main() {
     throw new Error("Unsupported platform");
   }
   await createFileStructure();
-  await server.webServer(port);
 }
 
 main()
   .then(() => {
+    server.webServer(port);
     console.log(`Server has started listening on port ${port}`);
   })
   .catch((error) => {
