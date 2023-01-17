@@ -16,48 +16,53 @@
     }
 
     .content-grid {
+        align-content: flex-start;
         display: grid;
-        grid-gap: 1.5%;
+        max-width: 100vw;
+        grid-gap: 20px;
         margin: 2%;
-    }
-
-    @media only screen and (max-width: 1920px) {
-    .content-grid {
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-        grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-    }
-    }
-
-    @media only screen and (max-width: 1200px) {
-    .content-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: 1fr 1fr 1fr;
-    }
-    }
-
-    @media only screen and (max-width: 992px) {
-    .content-grid {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-    }
-    }
-
-    @media only screen and (max-width: 768px) {
-    .content-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr;
-    }
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-rows: repeat(auto-fill, minmax(300px, 1fr));
     }
 
     .content {
-        display: flex;
         flex-direction: column;
-        align-items: center;
-        vertical-align: middle;
-        justify-content: center;
         background-color: #404abe;
         border-radius: 1rem;
         overflow: hidden;
+        margin-bottom: auto;
+    }
+
+    .user-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-left: 10px;
+        margin-top: 5px;
+    }
+
+    .avatar-image {
+        border-radius: 55%;
+        width: 2.5rem;
+        height: 2.5rem;
+        vertical-align: middle;
+    }
+
+    .username-text {
+        font-weight: bold;
+        justify-content: left;
+        margin-left: 10px;
+        display: inline-block;
+    }
+
+    .content-text {
+        text-align: center;
+        margin-left: 15px;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        margin-top: 5px;
+        line-height: 1.5;
+        overflow-wrap: break-word;
     }
 
     .button {
@@ -114,6 +119,19 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #404abe;
     }
+
+    .image-grid {
+        display: grid;
+        overflow: hidden;
+        margin-bottom: auto;
+        align-content: flex-start;
+    }
+
+    .image-grid-item {
+        display: flex;
+        overflow: hidden;
+        margin-bottom: auto;
+    }
 </style>
   
 <noscript>
@@ -125,29 +143,7 @@
     </div>
 </noscript>
 
-<head>
-    <title>ArchiveWeb - <%= archiveName %></title>
-</head>
-
-<body>
-    <div class="title-box">
-        <h1 style="margin-bottom: 0; margin-left: 2.5%;">ArchiveWeb - <%= archiveName %></h1>
-        <p style="margin-left: 2.5%;">Storing the essentials since 2023</p>
-        <button class="button" onclick="refresh()" style="position: absolute; right: 0; transform: translateY(80%); margin-right: 1.5%;"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Refresh_icon.svg" style="filter: invert(100%);" /></button>
-    </div>
-    <% if (archiveEntries.length == 0) { %>
-        <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
-        <br>Click refresh to gather new entries!</p>
-    <% } %>
-    <div class="content-grid">
-        <% archiveEntries.forEach(function(item) { %>
-            <div class="content">
-                <p><%= item[0] %></p>
-                <image src="<%= item[1] %>" style="width: 100%; height: 100%; object-fit: cover;"/>
-            </div>
-        <% }); %>
-    </div>
-</body>
+<script language="JavaScript" type="text/javascript" src="/js/jquery-3.6.3.min.js"></script>
 
 <script>
     function refresh() {
@@ -160,3 +156,116 @@
         }));
     }
 </script>
+
+<head>
+    <title>ArchiveWeb - <%= archiveName %></title>
+</head>
+
+<body>
+    <div class="title-box">
+        <h1 style="margin-bottom: 0; margin-left: 2.5%;">ArchiveWeb - <%= archiveName %></h1>
+        <p style="margin-left: 2.5%;">Storing the essentials since 2023</p>
+        <button class="button" onclick="refresh()" style="position: absolute; right: 0; transform: translateY(120%); margin-right: 1.5%;"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Refresh_icon.svg" style="filter: invert(100%);" /></button>
+        <p id="entrycount" style="position: absolute; right: 0; margin-right: 1.5%;"></p>
+    </div>
+    <% if (archiveEntries.length == 0) { %>
+        <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
+        <br>Click refresh to gather new entries!</p>
+    <% } %>
+    <div class="content-grid">
+        <!-- for each item in each folder of the archive entries -->
+        <% let i = 0; archiveEntries.forEach(function(item) { %>
+            <% i++ %>
+            <div class="content">
+                <!-- display the user information -->
+                <div class="user-box">
+                    <img class="avatar-image" id=<%= "avatar-" + i %>>
+                    <p class="username-text" id=<%= "user-" + i %>>
+                </div>
+                
+                <!-- display the content -->
+                <p class="content-text" id=<%= "data-" + i %>>
+                
+                <!-- display the media -->
+                <div class="image-grid">
+                    <% item.mediaFiles.forEach(function(mediaFile) { 
+                        if (mediaFile.endsWith(".jpg" || ".png")) { 
+                            let split = mediaFile.split(".");
+                            let previewImage = split[0] + "_preview." + split[1];
+                    %>
+                        <div class="image-grid-item">
+                            <img src="<%= '../datastructure/' + archiveName + '/assets/' + previewImage %>" style="width: 100%;"/>
+                        </div>
+                        <% } else if (mediaFile.endsWith(".mp4")) { %>
+                        <div class="image-grid-item">
+                            <video autoplay muted loop style="width: 100%;">
+                                <source src="<%= '../datastructure/' + archiveName + '/assets/' + mediaFile %>" type="video/mp4">
+                            </video>
+                        </div>
+                        <% } %>
+                    <% }); %>
+                </div>
+
+                <!-- request the json file using the getJson() function using JQuery -->
+                <script>
+                    try {
+                        const path = "../datastructure/" + `<%= archiveName %>`.toString() + "/assets/" + `<%= item.informationFile %>`.toString();
+                        $(document).ready($.getJSON(path, function(data) {
+                            document.getElementById("avatar-" + <%= i %>).src = data.author.profile_image;
+                            document.getElementById("user-" + <%= i %>).innerHTML = "@" + data.author.name;
+                            document.getElementById("data-" + <%= i %>).innerHTML = data.content;
+                        }));
+                    } catch (error) {
+                        console.log(error);
+                    }
+                </script>
+            </div>
+        <% }); 
+        %>
+        <script>
+            // if avatar images are not loaded, use the default image
+            const avatarImages = document.querySelectorAll('.avatar-image');
+            var avatarArray = [...avatarImages];
+
+            avatarArray.forEach(avatarImage => {
+                // if src 404s, use the default image
+                var http = new XMLHttpRequest();
+                http.open('HEAD', avatarImage.src, false);
+                http.send();
+                if (http.status == 404)
+                    avatarImage.src = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
+            });
+
+            const imageGrid = document.querySelectorAll('.image-grid');
+            var gridArray = [...imageGrid];
+
+            gridArray.forEach(imageGrid => {
+                const imageGridItems = imageGrid.querySelectorAll('.image-grid-item');
+                const numberOfImages = imageGridItems.length;
+                
+                if (numberOfImages === 1) {
+                    imageGrid.style.gridTemplateColumns = '1fr';
+                } else if (numberOfImages === 2) {
+                    imageGrid.style.gridTemplateColumns = '1fr 1fr';
+                } else if (numberOfImages === 3) {
+                    imageGrid.style.gridTemplateColumns = '1fr 1fr';
+                    imageGrid.style.gridTemplateRows = '1fr ' + imageGridItems[2].clientHeight - 1 + 'px';
+                    imageGridItems[0].style.gridColumn = '1 / 3';
+                } else if (numberOfImages === 4) {
+                    imageGrid.style.gridTemplateColumns = '1fr 1fr';
+                    imageGrid.style.gridTemplateRows = '1fr ' + imageGridItems[2].clientHeight - 1 + 'px';
+                } else {
+                    imageGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(150px, 1fr))';
+                }
+
+                imageGridItems.forEach(imageGridItem => {
+                        // stretch the image to fit the grid
+                        imageGridItem.style.width = '100%';
+                        imageGridItem.style.height = '100%';
+                });
+            });
+
+            document.getElementById("entrycount").innerHTML = <%= i %> + " entries";
+        </script>
+    </div>
+</body>
