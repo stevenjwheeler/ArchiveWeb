@@ -11,7 +11,7 @@ function refresh() {
   refreshButton.classList.add("button-loading-spinner");
 
   // send a POST request to the server to refresh the archive
-  var xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
   xhr.open("POST", "/refresh-archive", true);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(
@@ -51,7 +51,7 @@ function loadAndFadeOnScroll() {
         // check the avatar
         const avatarImage = entry.target.querySelector(".avatar-image");
 
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("HEAD", avatarImage.src, true);
         xhr.send();
 
@@ -72,8 +72,8 @@ function loadAndFadeOnScroll() {
           // once the content is loaded, fade it in
           entry.target.style.visibility = "visible";
           entry.target.classList.add("fade-in");
-        }),
-          observer.unobserve(entry.target);
+        });
+        observer.unobserve(entry.target);
       }
     });
   }
@@ -94,7 +94,7 @@ function loadContent(mediaImages, mediaVideos) {
 
 function moveImages() {
   const imageGrid = document.querySelectorAll(".image-grid");
-  var gridArray = [...imageGrid];
+  const gridArray = [...imageGrid];
 
   gridArray.forEach((imageGrid) => {
     const imageGridItems = imageGrid.querySelectorAll(".image-grid-item");
@@ -128,7 +128,7 @@ function moveImages() {
 
 function expandedView(id) {
   //remove the bigint n from the id
-  const idNumber = id.replace("n", "");
+  id.replace("n", "");
   const expandedView = document.querySelector(".expanded-view");
 
   // get the info for the post using the id by querying the archiveDatabase.json
