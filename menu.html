@@ -1,112 +1,56 @@
-<style>
-    body {
-        margin: 0;
-        background-color: #23272a;
-        color: white;
-        font-family: "Bahnschrift Light";
-    }
+<!DOCTYPE html>
 
-    .title-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 20vh;
-    }
-
-    .button-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .button {
-        display: block;
-        width: 75%;
-        height: 10vh;
-        margin: 10px 0;
-        background-color: #404abe;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-
-    .button:hover {
-        background-color: #5865f2;
-    }
-
-    .javascript-error-background {
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        background-color: #23272a;
-    }
-
-    .javascript-error {
-        display: flex;
-        color: rgb(180, 46, 46);
-        font-size: 1.5rem;
-        font-weight: bold;
-        text-align: center;
-        background-color: white;
-        padding: 1.5rem;
-        margin: 1.5rem;
-        border-radius: 1rem;
-    }
-
-    ::-webkit-scrollbar {
-        width: 0.6em;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #1e2124;
-        border-radius: 50px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #3e4244;
-        border-radius: 50px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #404abe;
-    }
-</style>
-  
-<noscript>
-    <div class="javascript-error-background">
-        <div class="javascript-error">
-            This web app requires JavaScript to be enabled in order to function properly.<br>
-            Please enable JavaScript in your browser settings or unblock scripts, and try again.
-        </div>
-    </div>
-</noscript>
-
-<head>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/assets/menuView.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ArchiveWeb</title>
-</head>
+  </head>
 
-<body>
+  <noscript>
+    <div class="javascript-error-background">
+      <div class="javascript-error">
+        This web app requires JavaScript to be enabled in order to function
+        properly.<br />
+        Please enable JavaScript in your browser settings or unblock scripts,
+        and try again.
+      </div>
+    </div>
+  </noscript>
+  
+  <body>
     <div class="title-box">
-        <h1>ArchiveWeb</h1>
-        <p>Storing the essentials since 2023</p>
+      <h1>ArchiveWeb</h1>
+      <p>Storing the essentials since 2023</p>
     </div>
     <div class="button-box">
-        <!-- for each item in archiveList, create a button -->
-        <% if (archiveList.length == 0) { %>
-            <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">No archives found.
-            <br>Go to settings and tools to make your first archive!</p>
-        <% } %>
-        <% archiveList.forEach(function(item) { %>
-            <% itemname = item[0] %>
-            <button class="button" onclick="location.href='./archive/<%= itemname %>'"><%= itemname %> archive</button>
-        <% }); %>
+      <!-- for each item in archiveList, create a button -->
+      <% if (archiveList.length == 0) { %>
+      <p
+        style="
+          text-align: center;
+          font-weight: bold;
+          margin-top: 2.5%;
+          margin-bottom: 2.5%;
+        "
+      >
+        No archives found. <br />Go to settings and tools to make your first
+        archive!
+      </p>
+      <% } %> <% archiveList.forEach(function(item) { %> <% itemname = item[0]
+      %>
+      <button
+        class="button"
+        onclick="location.href='./archive/<%= itemname %>'"
+      >
+        <%= itemname %> archive
+      </button>
+      <% }); %>
 
-        <button class="button" onclick="location.href='./settings/menu'">Settings and tools</button>
+      <button class="button" onclick="location.href='./settings/menu'">
+        Settings and tools
+      </button>
     </div>
-</body>
+  </body>
+</html>
