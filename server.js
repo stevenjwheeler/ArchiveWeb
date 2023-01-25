@@ -23,7 +23,7 @@ module.exports = {
     
     // set up the routes for getting pages
     app.get('/', (req, res) => {
-      res.render('menu.html', {archiveList: archiveList})
+      res.render('menuView.html', {archiveList: archiveList})
     })
 
     app.get('/datastructure/:archive/assets/:folder/:file', (req, res) => {
@@ -104,9 +104,9 @@ module.exports = {
       for (let i = 0; i < archiveList.length; i++) {
         if (archiveList[i][0] === archiveName) {
           const archiveSource = archiveList[i][1]
-          const cookies = archiveList[i][2]
+          const archiveCookies = archiveList[i][2]
 
-          importer.runImport(archiveName).then(() => {
+          importer.runImport(archiveName, archiveSource, archiveCookies).then(() => {
             res.status(200).send('Archive refreshed');
           });
         }
