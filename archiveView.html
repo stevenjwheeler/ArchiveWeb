@@ -15,6 +15,7 @@
         display: flex;
         flex-direction: column;
         border-bottom: #3e4244 1px solid;
+        z-index: 99999;
     }
 
     .title-box-grid {
@@ -46,6 +47,7 @@
     }
 
     .content {
+        visibility: hidden;
         flex-direction: column;
         background-color: #404abe;
         border-radius: 1rem;
@@ -167,6 +169,15 @@
         animation: button-loading-spinner 1s ease infinite;
     }
 
+    .fade-in {
+        animation: fadeIn 2s;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
 </style>
 
 <html lang="en">
@@ -217,8 +228,9 @@
             }
         }
 
-        function loadImages() {
-            const images = document.querySelectorAll(".media-image");
+        function loadAndFadeOnScroll() {
+            const content = document.querySelectorAll(".content");
+            const loadingtext = document.getElementById("loading-text");
     
             const options = {
             root: null,
@@ -228,64 +240,55 @@
     
             const observer = new IntersectionObserver(onIntersection, options);
     
-            images.forEach(image => {
-            observer.observe(image);
+            content.forEach(content => {
+                observer.observe(content);
             });
     
             function onIntersection(entries) {
                 entries.forEach(entry => {
-                if (entry.intersectionRatio > 0) {
-                    entry.target.src = entry.target.dataset.src;
-                    observer.unobserve(entry.target);
-                }
-                });
-            }
-        }
+                    if (entry.intersectionRatio > 0) {
+                        // check the avatar
+                        const avatarImage = entry.target.querySelector('.avatar-image');
 
-        function loadVideos() {
-            const sources = document.querySelectorAll(".media-video");
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("HEAD", avatarImage.src, true);
+                        xhr.send();
 
-            const options = {
-                root: null,
-                rootMargin: "0px",
-                threshold: 0
-            };
+                        xhr.onreadystatechange = function() {
+                            if (this.readyState == this.DONE) {
+                                if (this.status == 404) {
+                                    avatarImage.src = "/assets/default-avatar.png";
+                                }
+                            }
+                        }   
 
-            const observer = new IntersectionObserver(onIntersection, options);
+                        // grab the media-image and media-video elements
+                        const mediaImages = entry.target.querySelectorAll(".media-image");
+                        const mediaVideos = entry.target.querySelectorAll(".media-video");
 
-            sources.forEach(source => {
-                observer.observe(source);
-            });
-
-            function onIntersection(entries) {
-                entries.forEach(entry => {
-                if (entry.intersectionRatio > 0) {
-                    entry.target.src = entry.target.dataset.src;
-                    observer.unobserve(entry.target);
-                }
-                });
-            }
-        }
-
-        function checkAvatarImages() {
-            // if avatar images are not loaded, use the default image
-            const avatarImages = document.querySelectorAll('.avatar-image');
-            var avatarArray = [...avatarImages];
-
-            avatarArray.forEach(avatarImage => {
-                // do a async request to check if the image exists
-                var xhr = new XMLHttpRequest();
-                xhr.open("HEAD", avatarImage.src, true);
-                xhr.send();
-
-                xhr.onreadystatechange = function() {
-                    if (this.readyState == this.DONE) {
-                        if (this.status == 404) {
-                            avatarImage.src = "/assets/default-avatar.png";
-                        }
+                        // load each mediaImage and mediaVideo
+                        loadContent(mediaImages, mediaVideos).then(() => {
+                            // once the content is loaded, fade it in
+                            entry.target.style.visibility = "visible";
+                            entry.target.classList.add("fade-in"); 
+                        }),
+                        observer.unobserve(entry.target);
                     }
-                }
+                });
+            }
+            loadingtext.style.visibility = "hidden";
+            loadingtext.style.margin = "0";
+        }
+
+        function loadContent(mediaImages, mediaVideos) {
+            mediaImages.forEach(mediaImage => {
+                mediaImage.src = mediaImage.dataset.src;
+                moveImages();
             });
+            mediaVideos.forEach(mediaVideo => {
+                mediaVideo.src = mediaVideo.dataset.src;
+            });
+            return Promise.resolve();
         }
 
         function moveImages() {
@@ -320,7 +323,7 @@
         }
     </script>
 
-    <body onload="checkAvatarImages(), loadImages(), loadVideos(), moveImages()">
+    <body onload="loadAndFadeOnScroll()">
         <div class="title-box">
             <!-- create a grid of 1 row 2 columns that has the h1 and p in one side the button and entrycount in the other -->
             <div class="title-box-grid">
@@ -339,6 +342,7 @@
             <p style="text-align: center; font-weight: bold; margin-top: 2.5%; margin-bottom: 2.5%;">This archive is empty.
             <br>Click refresh to gather new entries!</p>
         <% } %>
+        <p id="loading-text" style="text-align: center; font-weight: bold; margin-top: 2.5%;">Opening the archive...</p>
         <div class="content-grid">
             <!-- for each item in each folder of the archive entries -->
             <% let i = 0; archiveEntries.forEach(function(item) { %>
