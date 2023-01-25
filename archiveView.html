@@ -153,6 +153,33 @@
         });
       });
     }
+
+    function expandedView(id) {
+      //remove the bigint n from the id
+      const idNumber = id.replace("n", "");
+      const expandedView = document.querySelector(".expanded-view");
+
+      // get the info for the post using the id by querying the archiveDatabase.json
+      
+
+      //expandedView.getElementById("expanded-view-avatar").src = data.author.profile_image;
+
+
+      // set the visibility to visible
+      expandedView.classList.remove("pop-out");
+      expandedView.style.visibility = "visible";
+      expandedView.classList.add("pop-in");
+    }
+
+    function closeExpandedView() {
+      const expandedView = document.querySelector(".expanded-view");
+      expandedView.classList.add("pop-out")
+      // wait for the animation to finish
+      setTimeout(() => {
+        expandedView.style.visibility = "hidden";
+      }, 230);
+      expandedView.classList.remove("pop-in");
+    }
   </script>
 
   <body onload="loadAndFadeOnScroll()">
@@ -167,8 +194,8 @@
             <p id="entrycount" style="text-align: right"></p>
             <button class="refresh-button" onclick="refresh()">
               <img
-                src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Refresh_icon.svg"
-                style="filter: invert(100%)"
+                src="/assets/refresh.png"
+                style="filter: invert(100%); height: 25px; width: 25px; align-self: center;"
                 alt="refresh"
               />
             </button>
@@ -197,7 +224,8 @@
     <div class="content-grid">
       <!-- for each item in each folder of the archive entries -->
       <% let i = 0; archiveEntries.forEach(function(item) { %> <% i++ %>
-      <div class="content">
+        
+      <div class="content" onclick="expandedView('<%= item.id %>n')">
         <!-- display the user information -->
         <div class="user-box">
           <img class="avatar-image" id="avatar-<%= i %>" alt="avatar"/>
@@ -213,7 +241,7 @@
           (mediaFile.endsWith(".jpg" || ".png")) { let split =
           mediaFile.split("."); let previewImage = split[0] + "_preview." +
           split[1]; %>
-          <div class="image-grid-item">
+          <div class="image-grid-item" style="pointer-events: none;">
             <img
               class="media-image"
               data-src="<%= '../datastructure/' + archiveName + '/assets/' + previewImage %>"
@@ -222,7 +250,7 @@
             />
           </div>
           <% } else if (mediaFile.endsWith(".mp4")) { %>
-          <div class="image-grid-item">
+          <div class="image-grid-item" style="pointer-events: none;">
             <video
               class="media-video"
               autoplay
@@ -255,5 +283,21 @@
         document.getElementById("entrycount").innerHTML = <%= i %> + " entries";
       </script>
     </div>
+
+      <div class="expanded-view">
+        <div class="user-box">
+          <img class="avatar-image" id="expanded-view-avatar" alt="avatar" src="/assets/default-avatar.png"/>
+          <p class="username-text" id="expanded-view-username"> @test </p>
+          <button class="expanded-view-close-button" onclick="closeExpandedView()">
+            <img
+              src="/assets/close-button.png"
+              style="filter: invert(100%); width: 2rem; height: 2rem;"
+              alt="refresh"
+            />
+          </button>
+        </div>
+        <p class="content-text" id="expanded-view-contenttext"> this is a sentence that is meant to emulate the sentence that might be found on a twitter tweet. </p>
+        <div class="expanded-media-carousel">
+      </div>
   </body>
 </html>
