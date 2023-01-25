@@ -33,14 +33,14 @@
 
   <body onload="loadAndFadeOnScroll()">
     <div class="title-box">
-      <!-- create a grid of 1 row 2 columns that has the h1 and p in one side the button and entrycount in the other -->
+      <!-- create a grid of 1 row 2 columns that has the h1 and p in one side the button and entry count in the other -->
       <div class="title-box-grid">
         <div>
           <h1><%= archiveName %></h1>
         </div>
         <div>
           <div class="refresh-entry-info">
-            <p id="entrycount" style="text-align: right"></p>
+            <p id="entry-count" style="text-align: right"></p>
             <button class="refresh-button" onclick="refresh()">
               <img
                 src="/assets/refresh.png"
@@ -118,9 +118,9 @@
           try {
               const path = "../datastructure/" + `<%= archiveName %>`.toString() + "/assets/" + `<%= item.informationFile %>`.toString();
               $(document).ready($.getJSON(path, function(data) {
-                  document.getElementById("avatar-" + <%= i %>).src = data.author.profile_image;
-                  document.getElementById("user-" + <%= i %>).innerHTML = "@" + data.author.name;
-                  document.getElementById("data-" + <%= i %>).innerHTML = data.content;
+                  document.getElementById("avatar-<%= i %>").src = data.author.profile_image;
+                  document.getElementById("user-<%= i %>").innerHTML = "@" + data.author.name;
+                  document.getElementById("data-<%= i %>").innerHTML = data.content;
               }));
           } catch (error) {
               console.log(error);
@@ -129,7 +129,7 @@
       </div>
       <% }); %>
       <script>
-        document.getElementById("entrycount").innerHTML = <%= i %> + " entries";
+        document.getElementById("entry-count").innerHTML = "<%= i %> entries";
       </script>
     </div>
 
