@@ -1,15 +1,46 @@
+const { assert } = require("console");
 const fs = require("fs");
 const path = require("path");
 
 module.exports = {
-  async runImport(archiveName) {
-    // run gallery-dl to download the archive and fill the folder
+  async runImport(archiveName, archiveSourceURL, archiveCookies) {
+    /* // run gallery-dl to download the archive and fill the folder
+    const { exec } = require("child_process");
+
+    // take each key:value pair in the cookie string and add it to the cookie object
+
+    let cookieObject = {};
+    let cookieArray = archiveCookies.split(";");
+    for (let i = 0; i < cookieArray.length; i++) {
+      // remove any spaces at the beginning of the string
+      cookieArray[i] = cookieArray[i].trim();
+
+      // split the string into key and value
+      let cookie = cookieArray[i].split("=");
+
+      // add the key:value pair to the cookie object
+      cookieObject[cookie[0]] = cookie[1];
+
+      // write the cookie object to a txt file
+      fs.writeFileSync( path.join(__dirname, "datastructure", archiveName, "cookies.txt"), JSON.stringify(cookieObject));
+    }
+
+    //execute gallery-dl and wait for it to finish
+    await exec(
+      `gallery-dl ${archiveSourceURL} --verbose --write-metadata -o skip=true --destination ./datastructure/${archiveName}/assets --cookies ./datastructure/${archiveName}/cookies.txt`,
+      function (err, stdout, stderr) {
+        console.log(stdout);
+        console.log(stderr);
+      }
+    ); */
 
     // process all the items in the folders into the database
     // for each item in each folder of assets...
     // 1. check if the item is already in the database
     // 2. if not, add it to the database
     // declare the array of ids
+      console.log("running import");
+    
     const directory = path.join(
       __dirname,
       "datastructure",
@@ -20,6 +51,7 @@ module.exports = {
       "datastructure",
       archiveName + "/archiveDatabase.json"
     );
+
     // read in the database
     const archiveEntries = JSON.parse(fs.readFileSync(database));
 
@@ -74,9 +106,10 @@ module.exports = {
                 }
               }
               if (!pathExists) {
-              archiveEntries[archiveEntries.length - 1].mediaFiles.push(
-                folders[i] + "/" + files[j]
-              )};
+                archiveEntries[archiveEntries.length - 1].mediaFiles.push(
+                  folders[i] + "/" + files[j]
+                );
+              }
 
               // generate preview images, ignore videos
               if (!files[j].endsWith(".mp4")) {
@@ -99,5 +132,5 @@ module.exports = {
       }
       fs.writeFileSync(database, JSON.stringify(archiveEntries));
     }
-  }
+  },
 };
