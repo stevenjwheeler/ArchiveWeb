@@ -1,6 +1,6 @@
     body {
         margin: 0;
-        background-color: #23272a;
+        background-color: #0e0f0f;
         color: white;
         font-family: "Bahnschrift Light";
     }
@@ -63,11 +63,11 @@
     }
 
     .user-box {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
         margin-left: 10px;
         margin-top: 5px;
+        max-width: 90%;
+        width: fit-content;
+        overflow-wrap: break-word;
     }
 
     .avatar-image {
@@ -219,30 +219,57 @@
         }
     }
 
+    .expanded-content {
+        max-width: 100%;
+        max-height: 78vh;
+        object-fit: scale-down;
+        min-width: -webkit-fill-available;
+    }
+
     .expanded-view {
         visibility: hidden;
         display: flex;
         flex-direction: column;
         box-shadow: #1e2124 0 0 30px;
-        position: fixed;
-        top: 5vh;
-        left: 5vw;
-        width: 90%;
-        height: 90%;
+        max-width: 90%;
+        max-height: 90%;
+        width: fit-content;
         background-color: #5865f2;
         border-radius: 1rem;
         z-index: 3;
+        margin: auto;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        height: fit-content;
+    }
+
+    .darken-layer {
+        visibility: hidden;
+        background-color: #000000;
+        opacity: 0.8;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 3;
+    }
+
+    .expanded-view-content {
+        text-align: center;
+        margin: 1rem;
+    }
+
+    .expanded-view-contenttext {
+        white-space: pre-wrap;
     }
 
     .expanded-media-carousel {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
         background-color: #262b64;
         border-radius: 1rem;
+        display: flex;
+        width: fit-content;
+        overflow: auto;
+        overflow-y: hidden;
+        align-self: center;
+        min-width: -webkit-fill-available;
     }
 
     .expanded-view-close-button {

@@ -1,34 +1,3 @@
-function refresh() {
-  const refreshButton = document.querySelector(".refresh-button");
-  // disable the refresh button for more clicks
-  refreshButton.disabled = true;
-  // set the style so that it is no longer a pointer cursor
-  refreshButton.style.cursor = "default";
-  // remove the hover effect
-  refreshButton.style.backgroundColor = "#404abe";
-
-  // add a loading spinner to the refresh button
-  refreshButton.classList.add("button-loading-spinner");
-
-  // send a POST request to the server to refresh the archive
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "/refresh-archive", true);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.send(
-    JSON.stringify({
-      archiveName: "<%= archiveName %>",
-    })
-  );
-
-  // wait for the server to respond with a 200 OK
-  xhr.onreadystatechange = function () {
-    if (xhr.status == 200) {
-      // reload the page
-      location.reload();
-    }
-  };
-}
-
 function loadAndFadeOnScroll() {
   const content = document.querySelectorAll(".content");
   const loadingtext = document.getElementById("loading-text");
@@ -126,16 +95,50 @@ function moveImages() {
   });
 }
 
-function expandedView(id) {
-  //remove the bigint n from the id
-  id.replace("n", "");
+function expandedView(mediaDataArray, avatar, username, content) {
   const expandedView = document.querySelector(".expanded-view");
+  const darkenLayer = document.querySelector(".darken-layer");
 
-  // get the info for the post using the id by querying the archiveDatabase.json
+  // get the expanded media carousel from the view
+  const expandedCarousel = document.querySelector('.expanded-media-carousel');
+  expandedCarousel.innerHTML = null;
 
-  //expandedView.getElementById("expanded-view-avatar").src = data.author.profile_image;
+  // add each of the media items to the carousel
+  mediaDataArray.forEach((mediaData) => {
+    // remove the _preview from the url if it exists
+    mediaData = mediaData.replace("_preview", "");
 
+    // add content into the slide
+    if (mediaData.includes(".mp4")) {
+      const mediaVideo = document.createElement('video');
+      mediaVideo.src = mediaData;
+      mediaVideo.setAttribute('controls', true);
+      mediaVideo.setAttribute('autoplay', true);
+      mediaVideo.setAttribute('loop', true);
+      mediaVideo.classList.add('expanded-content');
+      expandedCarousel.appendChild(mediaVideo);
+    } else if (mediaData.includes(".jpg") || mediaData.includes(".png")) {
+      const mediaImage = document.createElement('img');
+      mediaImage.classList.add('expanded-content');
+      mediaImage.src = mediaData;
+      expandedCarousel.appendChild(mediaImage);
+    }
+  });
+
+  // set the avatar
+  const expandedAvatar = document.querySelector('#expanded-view-avatar');
+  expandedAvatar.src = avatar;
+
+  // set the username
+  const expandedUsername = document.querySelector('#expanded-view-username');
+  expandedUsername.innerHTML = username;
+
+  // set the content
+  const expandedContent = document.querySelector('#expanded-view-contenttext');
+  expandedContent.innerHTML = content;
+  
   // set the visibility to visible
+  darkenLayer.style.visibility = "visible";
   expandedView.classList.remove("pop-out");
   expandedView.style.visibility = "visible";
   expandedView.classList.add("pop-in");
@@ -143,10 +146,16 @@ function expandedView(id) {
 
 function closeExpandedView() {
   const expandedView = document.querySelector(".expanded-view");
+  const darkenLayer = document.querySelector(".darken-layer");
+
   expandedView.classList.add("pop-out");
   // wait for the animation to finish
   setTimeout(() => {
     expandedView.style.visibility = "hidden";
+    darkenLayer.style.visibility = "hidden";
+    // remove all the images from the carousel
+    const expandedCarousel = document.querySelector('.expanded-media-carousel');
+    expandedCarousel.innerHTML = null;
   }, 230);
   expandedView.classList.remove("pop-in");
 }

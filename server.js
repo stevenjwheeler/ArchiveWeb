@@ -100,6 +100,7 @@ module.exports = {
     })
 
     app.post('/refresh-archive', (req, res) => {
+      console.log("refreshing archive")
       const archiveName = req.body.archiveName
       for (let i = 0; i < archiveList.length; i++) {
         if (archiveList[i][0] === archiveName) {

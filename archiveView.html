@@ -31,7 +31,64 @@
     src="/js/archiveView.js"
   ></script>
 
+  <script>
+    function refresh() {
+      const refreshButton = document.querySelector(".refresh-button");
+      // disable the refresh button for more clicks
+      refreshButton.disabled = true;
+      // set the style so that it is no longer a pointer cursor
+      refreshButton.style.cursor = "default";
+      // remove the hover effect
+      refreshButton.style.backgroundColor = "#404abe";
+
+      // add a loading spinner to the refresh button
+      refreshButton.classList.add("button-loading-spinner");
+
+      // send a POST request to the server to refresh the archive
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/refresh-archive", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send(
+        JSON.stringify({
+          archiveName: "<%= archiveName %>",
+        })
+      );
+
+      // wait for the server to respond with a 200 OK
+      xhr.onreadystatechange = function () {
+        if (xhr.status == 200) {
+          // reload the page
+          location.reload();
+        }
+      };
+    }
+
+    function accessExpandedView(uid) {
+      // remove the n off the end of the ID
+      uid = uid.substring(0, uid.length - 1);
+      // gather the media-data-{id}-{number} elements
+      const mediaData = document.querySelectorAll(`[id^="media-${uid}-"]`);
+      // create an array to store the data-src attributes
+      let mediaDataArray = [];
+      // for each element in the mediaData array
+      mediaData.forEach((element) => {
+        let mediaSrc;
+        mediaSrc = element.querySelector("img, video").getAttribute("data-src");
+        mediaDataArray.push(mediaSrc);
+      });
+      // get the avatar image, username and post content
+      const avatar = document.querySelector(`#avatar-${uid}`).getAttribute("src");
+      const username = document.querySelector(`#user-${uid}`).innerHTML;
+      const content = document.querySelector(`#data-${uid}`).innerHTML;
+
+      // call the expandedView function in archiveView.js
+      expandedView(mediaDataArray, avatar, username, content);
+      mediaDataArray = [];
+    }
+  </script>
+
   <body onload="loadAndFadeOnScroll()">
+    <div class="darken-layer" onclick="closeExpandedView()"></div>
     <div class="title-box">
       <!-- create a grid of 1 row 2 columns that has the h1 and p in one side the button and entry count in the other -->
       <div class="title-box-grid">
@@ -72,34 +129,37 @@
     </p>
     <div class="content-grid">
       <!-- for each item in each folder of the archive entries -->
-      <% let i = 0; archiveEntries.forEach(function(item) { %> <% i++ %>
+      <% let entries = 0; archiveEntries.forEach(function(item) { entries++ %>
         
-      <div class="content" onclick="expandedView('<%= item.id %>n')">
+      <div class="content" onclick="accessExpandedView('<%= item.id %>n')">
         <!-- display the user information -->
         <div class="user-box">
-          <img class="avatar-image" id="avatar-<%= i %>" alt="avatar"/>
-          <p class="username-text" id="user-<%= i %>" />
+          <img class="avatar-image" id="avatar-<%= item.id %>" alt="avatar"/>
+          <p class="username-text" id="user-<%= item.id %>" />
         </div>
 
         <!-- display the content -->
-        <p class="content-text" id="data-<%= i %>" />
+        <p class="content-text" id="data-<%= item.id %>" />
 
         <!-- display the media -->
         <div class="image-grid">
+          <% let i = 0; %>
           <% item.mediaFiles.forEach(function(mediaFile) { if
           (mediaFile.endsWith(".jpg" || ".png")) { let split =
           mediaFile.split("."); let previewImage = split[0] + "_preview." +
           split[1]; %>
-          <div class="image-grid-item" style="pointer-events: none;">
+          <div class="image-grid-item" id="media-<%= item.id %>-<%= i %>"style="pointer-events: none;">
             <img
               class="media-image"
               data-src="<%= '../datastructure/' + archiveName + '/assets/' + previewImage %>"
               style="width: 100%"
               alt="media"
+              type="image"
             />
           </div>
+          <% i++; %>
           <% } else if (mediaFile.endsWith(".mp4")) { %>
-          <div class="image-grid-item" style="pointer-events: none;">
+          <div class="image-grid-item" id="media-<%= item.id %>-<%= i %>" style="pointer-events: none;">
             <video
               class="media-video"
               autoplay
@@ -110,6 +170,7 @@
               type="video/mp4"
             />
           </div>
+          <% i++; %>
           <% } %> <% }); %>
         </div>
 
@@ -118,9 +179,9 @@
           try {
               const path = "../datastructure/" + `<%= archiveName %>`.toString() + "/assets/" + `<%= item.informationFile %>`.toString();
               $(document).ready($.getJSON(path, function(data) {
-                  document.getElementById("avatar-<%= i %>").src = data.author.profile_image;
-                  document.getElementById("user-<%= i %>").innerHTML = "@" + data.author.name;
-                  document.getElementById("data-<%= i %>").innerHTML = data.content;
+                  document.getElementById("avatar-<%= item.id %>").src = data.author.profile_image;
+                  document.getElementById("user-<%= item.id %>").innerHTML = "@" + data.author.name;
+                  document.getElementById("data-<%= item.id %>").innerHTML = data.content;
               }));
           } catch (error) {
               console.log(error);
@@ -129,14 +190,17 @@
       </div>
       <% }); %>
       <script>
-        document.getElementById("entry-count").innerHTML = "<%= i %> entries";
+        document.getElementById("entry-count").innerHTML = "<%= entries %> entries";
       </script>
     </div>
 
       <div class="expanded-view">
-        <div class="user-box">
-          <img class="avatar-image" id="expanded-view-avatar" alt="avatar" src="/assets/default-avatar.png"/>
-          <p class="username-text" id="expanded-view-username"> @test </p>
+        
+        <div class="content-box">
+          <div class="user-box">
+            <img class="avatar-image" id="expanded-view-avatar" alt="avatar" src="/assets/default-avatar.png"/>
+            <p class="username-text" id="expanded-view-username"></p>
+          </div>
           <button class="expanded-view-close-button" onclick="closeExpandedView()">
             <img
               src="/assets/close-button.png"
@@ -144,9 +208,13 @@
               alt="refresh"
             />
           </button>
+          <div class="expanded-view-content">
+            <div class="expanded-view-contenttext" id="expanded-view-contenttext"></div>
+          </div>
         </div>
-        <p class="content-text" id="expanded-view-contenttext"> this is a sentence that is meant to emulate the sentence that might be found on a twitter tweet. </p>
         <div class="expanded-media-carousel">
+
+        </div>
       </div>
   </body>
 </html>
